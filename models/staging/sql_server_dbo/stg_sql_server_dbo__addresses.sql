@@ -9,4 +9,4 @@ WITH src_budget AS (
     FROM {{ source('sql_server_dbo','addresses')}}
 )
 
-SELECT * FROM src_budget;
+SELECT * FROM src_budget
