@@ -5,10 +5,18 @@ models:
         enforced: true
     columns:
       - name: PROMO_ID
-        data_type: int
+        data_type: varchar
         constraints:
           - type: not_null
           - type: unique   
       - name: PROMO_NAME
         data_type: varchar
+      - name: DISCOUNT_DOLLAR
+        data_type: number(38,0)
+      - name: PROMO_STATUS
+        data_type: varchar
+      - name: _FIVETRAN_DELETED
+        data_type: boolean
+      - name: DATA_UPDATED_UTC
+        data_type: TIMESTAMP_TZ
       

@@ -15,9 +15,11 @@ transform_promo AS (
         DISCOUNT AS DISCOUNT_DOLLAR,
         STATUS AS PROMO_STATUS,
         _FIVETRAN_DELETED,
-        _FIVETRAN_SYNCED
+        CONVERT_TIMEZONE('UTC',_FIVETRAN_SYNCED) AS DATA_UPDATED_UTC
     FROM 
         src_promo
+    WHERE 
+        _FIVETRAN_DELETED IS NULL
     UNION ALL
         SELECT  
             md5('no promo') AS PROMO_ID,
