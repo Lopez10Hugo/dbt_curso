@@ -1,0 +1,14 @@
+models:
+  - name: stg_sql_server_dbo__promos
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: PROMO_ID
+        data_type: int
+        constraints:
+          - type: not_null
+          - type: unique   
+      - name: PROMO_NAME
+        data_type: varchar
+      

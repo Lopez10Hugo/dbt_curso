@@ -1,0 +1,162 @@
+version: 2
+
+sources:
+
+  - name: sql_server_dbo # name of the source 
+    schema: sql_server_dbo # this is the schema our raw data lives in
+    database: ALUMNO16_DEV_BRONZE_DB # this is the name of our database
+
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    freshness:
+      warn_after: {count: 600, period: day}
+      error_after: {count: 600, period: day}
+
+    tables:
+
+      - name: addresses
+        description: >
+         Data of every address.
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: address_id
+            description: >
+              Unique id to identify an address.
+            data_tests:
+              - unique
+              - not_null
+          - name: zipcode
+            description: >
+              Zipcode of a determined address.
+            data_tests:
+              - positive_values
+          - name: country
+            description: >
+              Country associated with an address.
+          - name: address
+            description: >
+              Name of the address.
+          - name: state
+            description: >
+              State of the associated address.
+          - name: _fivetran_deleted
+            description: >
+              True if the data is deleted from fivetran, false otherwise.
+          - name: _fivetran_synced
+            description: >
+              Date when the data sync with fivetran occurred.
+      - name: events
+        description: >
+          Data to describe an event on a website.
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: event_id
+            description: >
+              Unique id to identify an event.
+            data_tests:
+              - unique
+              - not_null
+          - name: page_url
+            description: >
+             url where the event occurred.
+          - name: user_id
+            description: >
+              id of the user who performed the event.
+          - name: product_id
+            description: >
+              Identifer of a certain product.
+          - name: session_id
+            description: >
+              Identifier of a certain session.
+          - name: created_at
+          - name: order_id
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+      - name: orders
+        description: >
+          Data to register an order.
+        loaded_at_field: _fivetran_synced
+        columns:
+          - name: order_id
+            description: >
+              Unique identifer of the order.
+            data_tests:
+              - unique
+              - not_null
+          - name: shipping_service
+          - name: shipping_cost
+          - name: address_id
+          - name: created_at
+          - name: promo_id
+          - name: estimated_delivery_at
+          - name: order_cost
+          - name: user_id
+          - name: order_total
+          - name: delivered_at
+          - name: tracking_id
+          - name: status
+          - name: _fivetran_deleted
+          - name: -fivetran_synced
+
+      - name: order_items
+        columns:
+          - name: order_id
+            data_tests:
+              - unique
+              - not_null
+          - name: product_id
+            data_tests:
+              - not_null
+              - unique
+              
+          - name: quantity
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+      
+      - name: products
+        columns:
+          - name: product_id
+            data_tests:
+              - unique
+              - not_null
+          - name: price
+          - name: name
+          - name: inventory
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
+
+      - name: promos 
+        columns:
+          - name: promo_id
+            data_tests:
+              - unique
+              - not_null
+          - name: discount
+          - name: status
+            description: '{{ doc("promos_status")}}'
+          - name: _fivetran_delted
+          - name: _fivetran_synced
+
+      - name: users
+        columns:
+          - name: user_id
+            data_tests:
+              - unique
+              - not_null
+          - name: updated_at
+          - name: address_id
+          - name: last_name
+          - name: created_at
+          - name: phone_number
+          - name: total_orders
+          - name: first_name
+          - name: email
+            description: >
+              User's email.
+            data_tests:
+              - check_email
+          - name: _fivetran_deleted
+          - name: _fivetran_synced
