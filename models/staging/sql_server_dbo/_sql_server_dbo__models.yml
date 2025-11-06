@@ -68,7 +68,7 @@ models:
           - relationships:
               arguments:
                 to: ref('stg_sql_server_dbo__country')
-                field: product_id  
+                field: COUNTRY_ID  
       - name: STATE_NAME
         description: >
           Name of the state.
@@ -95,7 +95,7 @@ models:
           - relationships:
               arguments:
                 to: ref('stg_sql_server_dbo__state')
-                field: product_id          
+                field: STATE_ID          
         data_type: varchar 
       - name: ZIPCODE
         description: >
@@ -143,7 +143,7 @@ models:
           - relationships:
               arguments:
                 to: ref('stg_sql_server_dbo__zipcode')
-                field: product_id          
+                field: ZIPCODE_ID          
       - name: ADDRESS_NAME
         description: >
           Name of the address.
@@ -167,7 +167,95 @@ models:
       - name: SHIPPING_SERVICE_NAME
         description: >
           Name of the shipping service.
-        data_type: varchar             
+        data_type: varchar
+
+  - name: stg_sql_server_dbo__orders
+    description: >
+      Data to describe every order.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ORDER_ID
+        description: >
+          Unique identifier of an order.
+        data_tests:
+          - unique
+          - not_null
+          - primary_key
+        data_type: varchar
+      - name: SHIPPING_SERVICE_ID
+        description: >
+          Unique identifier of a shipping service.
+        data_type: varchar
+        data_tests:
+          - relationships:
+              arguments:
+                field: SHIPPING_SERVICE_ID
+                to: ref('stg_sql_server_dbo__shipping_service')
+      - name: SHIPPING_COST_DOLLAR
+        description: >
+          Cost of shipping a certain order.
+        data_type: float
+        data_tests:
+          - not_null
+      - name: ADDRESS_ID
+        description: >
+          Unique identifier of a certain address.
+        data_type: varchar
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: 
+                field: ADDRESS_ID
+                to: ref('stg_sql_server_dbo__addresses')
+      - name: CREATED_AT_UTC
+        description: >
+          Date time (utc) of the order creation.
+        data_type: TIMESTAMP_TZ
+      - name: PROMO_ID
+        description: Unique identifier of a certain promotion.
+        data_type: varchar
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                field: PROMO_ID
+                to: ref('stg_sql_server_dbo__promos')
+      - name: ESTIMATED_DELIVERY_AT_UTC
+        description: Time (utc) of the estimated delivery time of the order.
+        data_type: TIMESTAMP_TZ
+      - name: ORDER_COST_DOLLAR  
+        description: Cost of the order (dollar)
+        data_type: float
+      - name: USER_ID
+        description: Unique identifier of a certain user.
+        data_type: varchar
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: 
+                field: USER_ID
+                to: ref('stg_sql_server_dbo__users')
+      - name: ORDER_TOTAL_DOLLAR
+        description: Total cost of the order (dollar)
+        data_type: float
+      - name: DELIVERED_AT_UTC
+        description: Date time (utc) of the delivery.
+        data_type: TIMESTAMP_TZ
+      - name: TRACKING_ID
+        description: Id to track de order.
+        data_type: varchar
+      - name: STATUS
+        description: '{{ doc("order_status")}}'
+        data_type: varchar
+      - name: _FIVETRAN_DELETED
+        description: Data to check if the register is deleted.
+        data_type: boolean
+      - name: DATA_UPDATED_UTC
+        description: Date time (utc) when the data was updated.
+        data_type: TIMESTAMP_TZ
+
 
 
  
