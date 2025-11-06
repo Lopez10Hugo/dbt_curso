@@ -25,6 +25,9 @@ models:
         description: >
           Status of the promotion (active/inactive)
         data_type: varchar
+        data_tests:
+          - accepted_values:
+              values: ['inactive','active']
       - name: _FIVETRAN_DELETED
         description: >
           Data to check if the field was deleted.
@@ -249,6 +252,9 @@ models:
       - name: STATUS
         description: '{{ doc("order_status")}}'
         data_type: varchar
+        data_tests:
+          - accepted_values:
+              values: ['shipped','delivered','preparing']
       - name: _FIVETRAN_DELETED
         description: Data to check if the register is deleted.
         data_type: boolean
