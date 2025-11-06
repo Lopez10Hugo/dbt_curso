@@ -1,22 +1,175 @@
 models:
   - name: stg_sql_server_dbo__promos
+    description: >
+      Transformed data of the promos table.
     config:
       contract:
         enforced: true
     columns:
       - name: PROMO_ID
+        description: >
+          Unique identifer of a promotion.
         data_type: varchar
         constraints:
           - type: not_null
           - type: unique   
       - name: PROMO_NAME
+        description: >
+          Name of the promotion.
         data_type: varchar
       - name: DISCOUNT_DOLLAR
+        description: >
+          Discount of the promotion (in dollars)
         data_type: number(38,0)
       - name: PROMO_STATUS
+        description: >
+          Status of the promotion (active/inactive)
         data_type: varchar
       - name: _FIVETRAN_DELETED
+        description: >
+          Data to check if the field was deleted.
         data_type: boolean
       - name: DATA_UPDATED_UTC
+        description: >
+          Date time (UTC) of the update of the data.
         data_type: TIMESTAMP_TZ
+
+  - name: stg_sql_server_dbo__country
+    description: >
+      Data of every country in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: COUNTRY_ID
+        description: >
+          Unique identifer of a country.
+        data_type: varchar
+        constraints:
+          - type: not_null
+          - type: unique   
+      - name: COUNTRY_NAME
+        description: >
+          Name of the country.
+        data_type: varchar
+
+  - name: stg_sql_server_dbo__state
+    description: >
+      Data of every state in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: COUNTRY_ID
+        description: >
+          Unique identifer of a country.
+        data_type: varchar 
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sql_server_dbo__country')
+                field: product_id  
+      - name: STATE_NAME
+        description: >
+          Name of the state.
+        data_type: varchar
+      - name: STATE_ID
+        description: >
+         Unique identifier of a state.
+        data_type: varchar
+        constraints:
+          - type: not_null
+          - type: unique  
+
+  - name: stg_sql_server_dbo__zipcode
+    description: >
+      Data of every zipcode in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: STATE_ID
+        description: >
+          Unique identifer of a state.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sql_server_dbo__state')
+                field: product_id          
+        data_type: varchar 
+      - name: ZIPCODE
+        description: >
+          ZIPCODE of a certain state and contry.
+        data_type: NUMBER(38,0)
+      - name: ZIPCODE_ID
+        description: >
+         Unique identifier of a zipcode.
+        data_type: varchar         
+        constraints:
+          - type: not_null
+          - type: unique
+
+  - name: stg_sql_server_dbo__addresses
+    description: >
+      Data to describe an address.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ADDRESS_ID
+        description: >
+         Unique identifier of an address.
+        data_type: varchar         
+        constraints:
+          - type: not_null
+          - type: unique 
+      - name: _FIVETRAN_DELETED
+        description: >
+          Data to check if the register is deleted.
+        data_type: boolean          
+      - name: DATA_UPDATED_UTC
+        description: >
+          Date time of the updated data (utc). 
+        data_type: TIMESTAMP_TZ          
+      - name: STREET
+        description: >
+          Name of the street of the certain address.
+        data_type: varchar           
+      - name: ZIPCODE_ID
+        description: >
+          Unique identifer of a zipcode.
+        data_type: varchar   
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sql_server_dbo__zipcode')
+                field: product_id          
+      - name: ADDRESS_NAME
+        description: >
+          Name of the address.
+        data_type: varchar
+
+  - name: stg_sql_server_dbo__shipping_service
+    description: >
+      Data of every shippping service available in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: SHIPPING_SERVICE_ID
+        description: >
+         Unique identifier of a certain shipping service.
+        data_type: varchar            
+        constraints:
+          - type: not_null
+          - type: unique
+          - type: primary_key
+      - name: SHIPPING_SERVICE_NAME
+        description: >
+          Name of the shipping service.
+        data_type: varchar             
+
+
+ 
+
       
