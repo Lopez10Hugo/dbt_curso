@@ -1,10 +1,19 @@
 {{
   config(
-    materialized='view'
+    materialized='incremental',
+    on_schema_change = 'fail',
+    unique_key = 'ORDER_ID'
   )
 }}
 
 WITH src_orders AS (
+    SELECT *
+    FROM {{ source('sql_server_dbo','orders')}}
+    {% if is_incremental() %}
+    WHERE _fivetran_synced > (SELECT MAX(DATA_UPDATED_UTC) FROM {{ this }})
+    {% endif %}
+)
+, orders_transform AS (
     SELECT 
         MD5(ORDER_ID) AS ORDER_ID,
         MD5(SHIPPING_SERVICE) AS SHIPPING_SERVICE_ID,
@@ -25,8 +34,8 @@ WITH src_orders AS (
         STATUS,
         _FIVETRAN_DELETED,
         CONVERT_TIMEZONE('UTC',_FIVETRAN_SYNCED) AS DATA_UPDATED_UTC
-    FROM {{ source('sql_server_dbo','orders')}}
+    FROM src_orders
     WHERE _FIVETRAN_DELETED IS NULL
 )
 
-SELECT * FROM src_orders
+SELECT * FROM orders_transform

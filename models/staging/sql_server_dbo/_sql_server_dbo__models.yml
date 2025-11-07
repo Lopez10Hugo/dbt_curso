@@ -262,6 +262,53 @@ models:
         description: Date time (utc) when the data was updated.
         data_type: TIMESTAMP_TZ
 
+  - name: stg_sql_server_dbo__order_items
+    description: >
+      Data of the relationship between products and order.
+    config:
+      contract:
+        enforced: true
+    columns:
+    - name: ORDER_ITEMS_ID
+      description: >
+        Unique identifier for each record in the order_items table, generated as an MD5 hash of ORDER_ID and PRODUCT_ID.
+      data_type: varchar
+      data_tests:
+        - unique
+        - not_null
+    - name: ORDER_ID
+      description: >
+        Unique identifier of the order, stored as an MD5 hash of the original ORDER_ID.
+      data_type: varchar
+      data_tests:
+        - relationships:
+            arguments:
+              field: ORDER_ID
+              to: ref('stg_sql_server_dbo__orders')
+    - name: PRODUCT_ID
+      description: >
+        Unique identifier of the product in the order, stored as an MD5 hash of the original PRODUCT_ID.
+      data_type: varchar
+      data_tests:
+        - relationships:
+            arguments:
+              field: PRODUCT_ID
+              to: ref('stg_sql_server_dbo__products')
+    - name: QUANTITY
+      description: >
+        Quantity of the specific product included in the order.
+      data_type: integer
+    - name: _FIVETRAN_DELETED
+      description: >
+        Boolean flag indicating if the record has been deleted in the source system (Fivetran soft delete).
+      data_type: boolean
+    - name: DATA_UPDATED_UTC
+      description: >
+        UTC timestamp indicating when the record was last updated or synchronized by Fivetran.
+      data_type: timestamp_tz
+
+
+
 
 
  
