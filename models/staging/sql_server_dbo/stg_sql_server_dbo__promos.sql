@@ -15,7 +15,7 @@ transform_promo AS (
         DISCOUNT AS DISCOUNT_DOLLAR,
         STATUS AS PROMO_STATUS,
         _FIVETRAN_DELETED,
-        CONVERT_TIMEZONE('UTC',_FIVETRAN_SYNCED) AS DATA_UPDATED_UTC
+        {{ convert_time_utc('_FIVETRAN_SYNCED') }} AS DATA_UPDATED_UTC
     FROM 
         src_promo
     WHERE 

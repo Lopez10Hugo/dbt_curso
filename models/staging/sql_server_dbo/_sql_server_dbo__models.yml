@@ -27,7 +27,8 @@ models:
         data_type: varchar
         data_tests:
           - accepted_values:
-              values: ['inactive','active']
+              arguments:
+                values: ['inactive','active']
       - name: _FIVETRAN_DELETED
         description: >
           Data to check if the field was deleted.
@@ -196,12 +197,6 @@ models:
               arguments:
                 field: SHIPPING_SERVICE_ID
                 to: ref('stg_sql_server_dbo__shipping_service')
-      - name: SHIPPING_COST_DOLLAR
-        description: >
-          Cost of shipping a certain order.
-        data_type: float
-        data_tests:
-          - not_null
       - name: ADDRESS_ID
         description: >
           Unique identifier of a certain address.
@@ -298,6 +293,9 @@ models:
       description: >
         Quantity of the specific product included in the order.
       data_type: integer
+    - name: SHIPPING_COST_LINE_DOLLAR 
+      description: Shippinig cost (dollar) of the specific line.
+      data_type: FLOAT
     - name: _FIVETRAN_DELETED
       description: >
         Boolean flag indicating if the record has been deleted in the source system (Fivetran soft delete).
