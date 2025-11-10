@@ -307,6 +307,56 @@ models:
         UTC timestamp indicating when the record was last updated or synchronized by Fivetran.
       data_type: timestamp_tz
 
+  - name: stg_sql_server_dbo__users
+    description: >
+      Data to describe an user.
+    config:
+      contract:
+        enforced: true
+    columns:
+    - name: USER_ID
+      description: Unique identifier of an user.
+      data_tests:
+        - unique
+        - not_null
+      data_type: varchar
+    - name: UPDATED_AT_UTC
+      description: Date time (utc) of the update.
+      data_type: timestamp_tz
+    - name: ADDRESS_ID
+      description: Unique identifier of an address.
+      data_type: varchar
+      data_tests:
+        - relationships:
+            arguments: 
+              field: ADDRESS_ID
+              to: ref('stg_sql_server_dbo__addresses')
+    - name: LAST_NAME
+      description: Last name of the user.
+      data_type: varchar
+    - name: CREATED_AT_UTC
+      description: Date time (utc) of the creation.
+      data_type: timestamp_tz    
+    - name: PHONE_NUMBER
+      description: phone number of the user.
+      data_type: varchar
+    - name: TOTAL_ORDERS
+      description: Number of orders the user has made.
+      data_type: number(38,0)
+    - name: FIRST_NAME
+      description: First name of the user.
+      data_type: varchar
+    - name: EMAIL
+      description: Email of the user.
+      data_type: varchar
+    - name: _FIVETRAN_DELETED
+      description: Data to check if the register is deleted.
+      data_type: boolean
+    - name: DATA_UPDATED_UTC
+      description: Date time (utc) of the update.
+      data_type: timestamp_tz
+
+
 
 
 
