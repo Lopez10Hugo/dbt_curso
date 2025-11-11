@@ -51,3 +51,9 @@ sources:
               Date that the data was loaded.
             data_tests:
               - not_null
+      - name: users
+        columns:
+          - name: Nombre
+          - name: DNI
+          - name: email
+          - name: fecha_alta_sistema
