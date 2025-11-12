@@ -1,0 +1,19 @@
+snapshots:
+  - name: users_check_snp
+    config:
+      hard_deletes: new_record  # options are: 'ignore', 'invalidate', or 'new_record'
+      strategy: check
+      target_schema: snapshots
+      unique_key: DNI
+      check_cols: 
+        - Nombre
+        - email
+    columns:
+      - name: dbt_valid_from
+        description: Timestamp when the record became valid.
+      - name: dbt_valid_to
+        description: Timestamp when the record stopped being valid.
+      - name: dbt_is_deleted
+        description: Indicates whether the record was deleted.
+      - name: dbt_updated_at
+        description: when the record was updated

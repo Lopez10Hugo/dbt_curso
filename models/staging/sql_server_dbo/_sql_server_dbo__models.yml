@@ -1,14 +1,365 @@
 models:
   - name: stg_sql_server_dbo__promos
+    description: >
+      Transformed data of the promos table.
     config:
       contract:
         enforced: true
     columns:
       - name: PROMO_ID
-        data_type: int
+        description: >
+          Unique identifer of a promotion.
+        data_type: varchar
         constraints:
           - type: not_null
           - type: unique   
       - name: PROMO_NAME
+        description: >
+          Name of the promotion.
         data_type: varchar
+      - name: DISCOUNT_DOLLAR
+        description: >
+          Discount of the promotion (in dollars)
+        data_type: number(38,0)
+      - name: PROMO_STATUS
+        description: >
+          Status of the promotion (active/inactive)
+        data_type: varchar
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['inactive','active']
+      - name: _FIVETRAN_DELETED
+        description: >
+          Data to check if the field was deleted.
+        data_type: boolean
+      - name: DATA_UPDATED_UTC
+        description: >
+          Date time (UTC) of the update of the data.
+        data_type: TIMESTAMP_TZ
+
+  - name: stg_sql_server_dbo__country
+    description: >
+      Data of every country in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: COUNTRY_ID
+        description: >
+          Unique identifer of a country.
+        data_type: varchar
+        constraints:
+          - type: not_null
+          - type: unique   
+      - name: COUNTRY_NAME
+        description: >
+          Name of the country.
+        data_type: varchar
+
+  - name: stg_sql_server_dbo__state
+    description: >
+      Data of every state in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: COUNTRY_ID
+        description: >
+          Unique identifer of a country.
+        data_type: varchar 
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sql_server_dbo__country')
+                field: COUNTRY_ID  
+      - name: STATE_NAME
+        description: >
+          Name of the state.
+        data_type: varchar
+      - name: STATE_ID
+        description: >
+         Unique identifier of a state.
+        data_type: varchar
+        constraints:
+          - type: not_null
+          - type: unique  
+
+  - name: stg_sql_server_dbo__zipcode
+    description: >
+      Data of every zipcode in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: STATE_ID
+        description: >
+          Unique identifer of a state.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sql_server_dbo__state')
+                field: STATE_ID          
+        data_type: varchar 
+      - name: ZIPCODE
+        description: >
+          ZIPCODE of a certain state and contry.
+        data_type: NUMBER(38,0)
+      - name: ZIPCODE_ID
+        description: >
+         Unique identifier of a zipcode.
+        data_type: varchar         
+        constraints:
+          - type: not_null
+          - type: unique
+
+  - name: stg_sql_server_dbo__addresses
+    description: >
+      Data to describe an address.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ADDRESS_ID
+        description: >
+         Unique identifier of an address.
+        data_type: varchar         
+        constraints:
+          - type: not_null
+          - type: unique 
+      - name: _FIVETRAN_DELETED
+        description: >
+          Data to check if the register is deleted.
+        data_type: boolean          
+      - name: DATA_UPDATED_UTC
+        description: >
+          Date time of the updated data (utc). 
+        data_type: TIMESTAMP_TZ          
+      - name: STREET
+        description: >
+          Name of the street of the certain address.
+        data_type: varchar           
+      - name: ZIPCODE_ID
+        description: >
+          Unique identifer of a zipcode.
+        data_type: varchar   
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sql_server_dbo__zipcode')
+                field: ZIPCODE_ID          
+      - name: ADDRESS_NAME
+        description: >
+          Name of the address.
+        data_type: varchar
+
+  - name: stg_sql_server_dbo__shipping_service
+    description: >
+      Data of every shippping service available in the db.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: SHIPPING_SERVICE_ID
+        description: >
+         Unique identifier of a certain shipping service.
+        data_type: varchar            
+        constraints:
+          - type: not_null
+          - type: unique
+          - type: primary_key
+      - name: SHIPPING_SERVICE_NAME
+        description: >
+          Name of the shipping service.
+        data_type: varchar
+
+  - name: stg_sql_server_dbo__orders
+    description: >
+      Data to describe every order.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: ORDER_ID
+        description: >
+          Unique identifier of an order.
+        data_tests:
+          - unique
+          - not_null
+          - primary_key
+        data_type: varchar
+      - name: SHIPPING_SERVICE_ID
+        description: >
+          Unique identifier of a shipping service.
+        data_type: varchar
+        data_tests:
+          - relationships:
+              arguments:
+                field: SHIPPING_SERVICE_ID
+                to: ref('stg_sql_server_dbo__shipping_service')
+      - name: ADDRESS_ID
+        description: >
+          Unique identifier of a certain address.
+        data_type: varchar
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: 
+                field: ADDRESS_ID
+                to: ref('stg_sql_server_dbo__addresses')
+      - name: CREATED_AT_UTC
+        description: >
+          Date time (utc) of the order creation.
+        data_type: TIMESTAMP_TZ
+      - name: PROMO_ID
+        description: Unique identifier of a certain promotion.
+        data_type: varchar
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                field: PROMO_ID
+                to: ref('stg_sql_server_dbo__promos')
+      - name: ESTIMATED_DELIVERY_AT_UTC
+        description: Time (utc) of the estimated delivery time of the order.
+        data_type: TIMESTAMP_TZ
+      - name: ORDER_COST_DOLLAR  
+        description: Cost of the order (dollar)
+        data_type: float
+      - name: USER_ID
+        description: Unique identifier of a certain user.
+        data_type: varchar
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: 
+                field: USER_ID
+                to: ref('stg_sql_server_dbo__users')
+      - name: ORDER_TOTAL_DOLLAR
+        description: Total cost of the order (dollar)
+        data_type: float
+      - name: DELIVERED_AT_UTC
+        description: Date time (utc) of the delivery.
+        data_type: TIMESTAMP_TZ
+      - name: TRACKING_ID
+        description: Id to track de order.
+        data_type: varchar
+      - name: STATUS
+        description: '{{ doc("order_status")}}'
+        data_type: varchar
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['shipped','delivered','preparing']
+      - name: _FIVETRAN_DELETED
+        description: Data to check if the register is deleted.
+        data_type: boolean
+      - name: DATA_UPDATED_UTC
+        description: Date time (utc) when the data was updated.
+        data_type: TIMESTAMP_TZ
+
+  - name: stg_sql_server_dbo__order_items
+    description: >
+      Data of the relationship between products and order.
+    config:
+      contract:
+        enforced: true
+    columns:
+    - name: ORDER_ITEMS_ID
+      description: >
+        Unique identifier for each record in the order_items table, generated as an MD5 hash of ORDER_ID and PRODUCT_ID.
+      data_type: varchar
+      data_tests:
+        - unique
+        - not_null
+    - name: ORDER_ID
+      description: >
+        Unique identifier of the order, stored as an MD5 hash of the original ORDER_ID.
+      data_type: varchar
+      data_tests:
+        - relationships:
+            arguments:
+              field: ORDER_ID
+              to: ref('stg_sql_server_dbo__orders')
+    - name: PRODUCT_ID
+      description: >
+        Unique identifier of the product in the order, stored as an MD5 hash of the original PRODUCT_ID.
+      data_type: varchar
+      data_tests:
+        - relationships:
+            arguments:
+              field: PRODUCT_ID
+              to: ref('stg_sql_server_dbo__products')
+    - name: QUANTITY
+      description: >
+        Quantity of the specific product included in the order.
+      data_type: integer
+    - name: SHIPPING_COST_LINE_DOLLAR 
+      description: Shippinig cost (dollar) of the specific line.
+      data_type: FLOAT
+    - name: _FIVETRAN_DELETED
+      description: >
+        Boolean flag indicating if the record has been deleted in the source system (Fivetran soft delete).
+      data_type: boolean
+    - name: DATA_UPDATED_UTC
+      description: >
+        UTC timestamp indicating when the record was last updated or synchronized by Fivetran.
+      data_type: timestamp_tz
+
+  - name: stg_sql_server_dbo__users
+    description: >
+      Data to describe an user.
+    config:
+      contract:
+        enforced: true
+    columns:
+    - name: USER_ID
+      description: Unique identifier of an user.
+      data_tests:
+        - unique
+        - not_null
+      data_type: varchar
+    - name: UPDATED_AT_UTC
+      description: Date time (utc) of the update.
+      data_type: timestamp_tz
+    - name: ADDRESS_ID
+      description: Unique identifier of an address.
+      data_type: varchar
+      data_tests:
+        - relationships:
+            arguments: 
+              field: ADDRESS_ID
+              to: ref('stg_sql_server_dbo__addresses')
+    - name: LAST_NAME
+      description: Last name of the user.
+      data_type: varchar
+    - name: CREATED_AT_UTC
+      description: Date time (utc) of the creation.
+      data_type: timestamp_tz    
+    - name: PHONE_NUMBER
+      description: phone number of the user.
+      data_type: varchar
+    - name: TOTAL_ORDERS
+      description: Number of orders the user has made.
+      data_type: number(38,0)
+    - name: FIRST_NAME
+      description: First name of the user.
+      data_type: varchar
+    - name: EMAIL
+      description: Email of the user.
+      data_type: varchar
+    - name: _FIVETRAN_DELETED
+      description: Data to check if the register is deleted.
+      data_type: boolean
+    - name: DATA_UPDATED_UTC
+      description: Date time (utc) of the update.
+      data_type: timestamp_tz
+
+
+
+
+
+
+ 
+
       

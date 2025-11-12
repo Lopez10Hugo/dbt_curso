@@ -4,7 +4,7 @@ sources:
 
   - name: sql_server_dbo # name of the source 
     schema: sql_server_dbo # this is the schema our raw data lives in
-    database: ALUMNO16_DEV_BRONZE_DB # this is the name of our database
+    database: "{{ env_var('DBT_ENVIRONMENTS') }}_BRONZE_DB" # this is the name of our database
 
     quoting:
       database: false
@@ -13,7 +13,7 @@ sources:
 
     freshness:
       warn_after: {count: 600, period: day}
-      error_after: {count: 600, period: day}
+      error_after: {count: 601, period: day}
 
     tables:
 
@@ -48,6 +48,7 @@ sources:
           - name: _fivetran_synced
             description: >
               Date when the data sync with fivetran occurred.
+
       - name: events
         description: >
           Data to describe an event on a website.
@@ -61,20 +62,29 @@ sources:
               - not_null
           - name: page_url
             description: >
-             url where the event occurred.
+              URL where the event occurred.
           - name: user_id
             description: >
-              id of the user who performed the event.
+              ID of the user who performed the event.
           - name: product_id
             description: >
-              Identifer of a certain product.
+              Identifier of a certain product.
           - name: session_id
             description: >
               Identifier of a certain session.
           - name: created_at
+            description: >
+              Date and time when the event was created.
           - name: order_id
+            description: >
+              Identifier of the related order, if applicable.
           - name: _fivetran_deleted
+            description: >
+              True if the data is deleted from fivetran, false otherwise.
           - name: _fivetran_synced
+            description: >
+              Date when the data sync with fivetran occurred.
+
       - name: orders
         description: >
           Data to register an order.
@@ -87,76 +97,160 @@ sources:
               - unique
               - not_null
           - name: shipping_service
+            description: >
+              Shipping service used for the order.
           - name: shipping_cost
+            description: >
+              Cost of shipping for the order.
           - name: address_id
+            description: >
+              Identifier of the address related to the order.
           - name: created_at
+            description: >
+              Date and time when the order was created.
           - name: promo_id
+            description: >
+              Identifier of the applied promotion.
           - name: estimated_delivery_at
+            description: >
+              Estimated date and time of delivery.
           - name: order_cost
+            description: >
+              Total cost of the order before discounts and shipping.
           - name: user_id
+            description: >
+              Identifier of the user who made the order.
           - name: order_total
+            description: >
+              Final total amount of the order.
           - name: delivered_at
+            description: >
+              Actual date and time when the order was delivered.
           - name: tracking_id
+            description: >
+              Tracking identifier for the shipment.
           - name: status
+            description: '{{ doc("order_status")}}'
           - name: _fivetran_deleted
-          - name: -fivetran_synced
+            description: >
+              True if the data is deleted from fivetran, false otherwise.
+          - name: _fivetran_synced
+            description: >
+              Date when the data sync with fivetran occurred.
 
       - name: order_items
+        description: >
+          data to describe the relationship between order and products.
         columns:
           - name: order_id
+            description: >
+              Identifier of the order to which the item belongs.
             data_tests:
               - unique
               - not_null
           - name: product_id
+            description: >
+              Identifier of the product included in the order.
             data_tests:
               - not_null
               - unique
-              
           - name: quantity
+            description: >
+              Quantity of the product ordered.
           - name: _fivetran_deleted
+            description: >
+              True if the data is deleted from fivetran, false otherwise.
           - name: _fivetran_synced
-      
+            description: >
+              Date when the data sync with fivetran occurred.
+
       - name: products
+        description: >
+          Data to describe a certain product.
         columns:
           - name: product_id
+            description: >
+              Unique identifier for the product.
             data_tests:
               - unique
               - not_null
           - name: price
+            description: >
+              Price of the product.
           - name: name
+            description: >
+              Name of the product.
           - name: inventory
+            description: >
+              Quantity of the product available in stock.
           - name: _fivetran_deleted
+            description: >
+              True if the data is deleted from fivetran, false otherwise.
           - name: _fivetran_synced
+            description: >
+              Date when the data sync with fivetran occurred.
 
       - name: promos 
+        description: >
+          Data to describe a promotion.
         columns:
           - name: promo_id
+            description: >
+              Unique identifier of the promotion.
             data_tests:
               - unique
               - not_null
           - name: discount
+            description: >
+              Discount percentage or amount offered by the promotion.
           - name: status
             description: '{{ doc("promos_status")}}'
           - name: _fivetran_delted
+            description: >
+              True if the data is deleted from fivetran, false otherwise.
           - name: _fivetran_synced
+            description: >
+              Date when the data sync with fivetran occurred.
 
       - name: users
+        description: >
+          Data to describe a user.
         columns:
           - name: user_id
+            description: >
+              Unique identifier of the user.
             data_tests:
               - unique
               - not_null
           - name: updated_at
+            description: >
+              Date and time when the user record was last updated.
           - name: address_id
+            description: >
+              Identifier of the user's associated address.
           - name: last_name
+            description: >
+              User's last name.
           - name: created_at
+            description: >
+              Date and time when the user was created.
           - name: phone_number
+            description: >
+              User's phone number.
           - name: total_orders
+            description: >
+              Total number of orders placed by the user.
           - name: first_name
+            description: >
+              User's first name.
           - name: email
             description: >
               User's email.
             data_tests:
               - check_email
           - name: _fivetran_deleted
+            description: >
+              True if the data is deleted from fivetran, false otherwise.
           - name: _fivetran_synced
+            description: >
+              Date when the data sync with fivetran occurred.
