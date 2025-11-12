@@ -186,7 +186,6 @@ models:
         data_tests:
           - unique
           - not_null
-          - primary_key
         data_type: varchar
       - name: SHIPPING_SERVICE_ID
         description: >
